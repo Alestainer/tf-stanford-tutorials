@@ -28,12 +28,17 @@ mnist = input_data.read_data_sets('/data/mnist', one_hot=True)
 # there are 10 classes for each image, corresponding to digits 0 - 9. 
 # Features are of the type float, and labels are of the type int
 
+X = tf.placeholder(tf.float32, shape = ( , 784))
+y = tf.placeholder(tf.int32, shape = ( , 10))
+
 
 # Step 3: create weights and bias
 # weights and biases are initialized to 0
 # shape of w depends on the dimension of X and Y so that Y = X * w + b
 # shape of b depends on Y
 
+w = tf.Variable(tf.zeros(shape = (784, 10)), name = 'weights')
+b = tf.Variable(tf.zeros(shape = (10)), name = 'biases')
 
 # Step 4: build model
 # the model that returns the logits.
