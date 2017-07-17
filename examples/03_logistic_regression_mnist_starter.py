@@ -16,11 +16,11 @@ import time
 # Define paramaters for the model
 learning_rate = 0.01
 batch_size = 128
-n_epochs = 10
+n_epochs = 25
 
 # Step 1: Read in data
 # using TF Learn's built in function to load MNIST data to the folder data/mnist
-mnist = input_data.read_data_sets('/data/mnist', one_hot=True) 
+mnist = input_data.read_data_sets('./data/mnist', one_hot=True) 
 
 # Step 2: create placeholders for features and labels
 # each image in the MNIST data is of shape 28*28 = 784
@@ -28,8 +28,8 @@ mnist = input_data.read_data_sets('/data/mnist', one_hot=True)
 # there are 10 classes for each image, corresponding to digits 0 - 9. 
 # Features are of the type float, and labels are of the type int
 
-X = tf.placeholder(tf.float32, shape = ( , 784))
-y = tf.placeholder(tf.int32, shape = ( , 10))
+X = tf.placeholder(tf.float32, shape = [None , 784], name = 'X')
+Y = tf.placeholder(tf.int32, shape = [None , 10], name = 'y')
 
 
 # Step 3: create weights and bias
@@ -37,8 +37,8 @@ y = tf.placeholder(tf.int32, shape = ( , 10))
 # shape of w depends on the dimension of X and Y so that Y = X * w + b
 # shape of b depends on Y
 
-w = tf.Variable(tf.zeros(shape = (784, 10)), name = 'weights')
-b = tf.Variable(tf.zeros(shape = (10)), name = 'biases')
+W = tf.Variable(tf.zeros(shape = [784, 10]), name = 'weights')
+b = tf.Variable(tf.zeros(shape = [10]), name = 'biases')
 
 # Step 4: build model
 # the model that returns the logits.
@@ -46,6 +46,7 @@ b = tf.Variable(tf.zeros(shape = (10)), name = 'biases')
 # to get the probability distribution of possible label of the image
 # DO NOT DO SOFTMAX HERE
 
+logits = tf.matmul(X, W) + b
 
 # Step 5: define loss function
 # use cross entropy loss of the real labels with the softmax of logits
@@ -53,10 +54,12 @@ b = tf.Variable(tf.zeros(shape = (10)), name = 'biases')
 # tf.nn.softmax_cross_entropy_with_logits(logits, Y)
 # then use tf.reduce_mean to get the mean loss of the batch
 
+loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = Y, logits = logits))
 
 # Step 6: define training op
 # using gradient descent to minimize loss
 
+optimizer = tf.train.GradientDescentOptimizer(learning_rate = 0.001).minimize(loss)
 
 with tf.Session() as sess:
 	start_time = time.time()
@@ -69,7 +72,8 @@ with tf.Session() as sess:
 			X_batch, Y_batch = mnist.train.next_batch(batch_size)
 			# TO-DO: run optimizer + fetch loss_batch
 			# 
-			# 
+			_, loss_batch = sess.run([optimizer, loss], feed_dict = {X: X_batch, Y: Y_batch})
+
 			total_loss += loss_batch
 		print('Average loss epoch {0}: {1}'.format(i, total_loss/n_batches))
 
@@ -87,7 +91,7 @@ with tf.Session() as sess:
 	
 	for i in range(n_batches):
 		X_batch, Y_batch = mnist.test.next_batch(batch_size)
-		accuracy_batch = sess.run([accuracy], feed_dict={X: X_batch, Y:Y_batch}) 
-		total_correct_preds += accuracy_batch	
+		accuracy_batch = sess.run([accuracy], feed_dict={X: X_batch, Y:Y_batch})
+		total_correct_preds += accuracy_batch[0]	
 	
 	print('Accuracy {0}'.format(total_correct_preds/mnist.test.num_examples))

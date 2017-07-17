@@ -53,7 +53,7 @@ with tf.Session() as sess:
 	sess.run(tf.global_variables_initializer())
 
 	# Step 8: train the model
-	for i in range(50): # run 100 epochs
+	for i in range(100): # run 100 epochs
 		total_loss = 0
 		for x, y in data:
 			# Session runs optimizer to minimize loss and fetch the value of loss. Name the received value as l
