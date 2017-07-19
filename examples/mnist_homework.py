@@ -9,9 +9,9 @@ from tensorflow.examples.tutorials.mnist import input_data
 import time
 
 # Define paramaters for the model
-learning_rate = 0.0001
+learning_rate = 0.001
 batch_size = 128
-n_epochs = 140
+n_epochs = 10
 
 # Step 1: Read in data
 # using TF Learn's built in function to load MNIST data to the folder data/mnist
@@ -33,22 +33,51 @@ Y = tf.placeholder(tf.int32, shape = [None , 10], name = 'y')
 # shape of b depends on Y
 
 # Hidden layers of ReLU and dropouts
-normed = tf.contrib.layers.batch_norm(inputs = X)
-h1 = tf.contrib.layers.fully_connected(inputs = normed, num_outputs = 40)
-h2 = tf.contrib.layers.fully_connected(inputs = h1, num_outputs = 20)
-hidden_out = tf.contrib.layers.fully_connected(inputs = h2, num_outputs = 40)
+input_layer = tf.reshape(X, [-1, 28, 28, 1])
+normed = tf.contrib.layers.batch_norm(inputs = input_layer)
+conv1 = tf.layers.conv2d(
+ inputs = input_layer,
+ filters = 32,
+ kernel_size = [5, 5],
+ padding = "SAME",
+ activation = tf.nn.relu)
 
-# Final logistic regression
-W = tf.Variable(tf.zeros(shape = [40, 10]), name = 'weights')
-b = tf.Variable(tf.zeros(shape = [10]), name = 'biases')
+pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
 
-# Step 4: build model
-# the model that returns the logits.
-# this logits will be later passed through softmax layer
-# to get the probability distribution of possible label of the image
-# DO NOT DO SOFTMAX HERE
+conv2 = tf.layers.conv2d(
+    inputs=pool1,
+    filters=64,
+    kernel_size=[5, 5],
+    padding="same",
+    activation=tf.nn.relu)
 
-logits = tf.matmul(hidden_out, W) + b
+pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
+
+pool2_flat = tf.reshape(pool2, [-1, 7 * 7 * 64])
+
+dense = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu)
+
+dropout = tf.layers.dropout(
+    inputs=dense, rate=0.4)
+
+logits = tf.layers.dense(inputs=dropout, units=10)
+
+
+# h1 = tf.contrib.layers.fully_connected(inputs = normed, num_outputs = 40)
+# h2 = tf.contrib.layers.fully_connected(inputs = h1, num_outputs = 20)
+# hidden_out = tf.contrib.layers.fully_connected(inputs = h2, num_outputs = 40)
+
+# # Final logistic regression
+# W = tf.Variable(tf.zeros(shape = [40, 10]), name = 'weights')
+# b = tf.Variable(tf.zeros(shape = [10]), name = 'biases')
+
+# # Step 4: build model
+# # the model that returns the logits.
+# # this logits will be later passed through softmax layer
+# # to get the probability distribution of possible label of the image
+# # DO NOT DO SOFTMAX HERE
+
+# logits = tf.matmul(hidden_out, W) + b
 
 # Step 5: define loss function
 # use cross entropy loss of the real labels with the softmax of logits
