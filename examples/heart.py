@@ -47,4 +47,14 @@ y = tf.placeholder(shape = [None, 1], name = "y")
 
 normed = tf.contrib.layers.batch_norm(inputs = X, name = "batch_norm")
 
-dense_1 = tf.layers.dense(inputs = normed, units = 200, activation = 'tahn')
+dense_1 = tf.layers.dense(inputs = normed, units = 40, activation = 'tahn')
+dense_2 = tf.layers.dense(inputs = dense_1, units = 20, activation = 'tahn')
+dense_3 = tf.layers.dense(inputs = dense_2, units = 10, activation = 'tahn')
+
+output = tf.layers.dense(inputs = dense_3, units = 1)
+
+# Define loss
+loss = tf.nn.softmax_cross_entropy_with_logits(labels = y, logits = output)
+
+# Optimizer
+optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate).minimize(loss)
