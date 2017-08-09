@@ -86,7 +86,8 @@ def get_batch(iterator, batch_size):
         yield center_batch, target_batch
 
 def process_data(vocab_size, batch_size, skip_window):
-    file_path = download(FILE_NAME, EXPECTED_BYTES)
+    #file_path = download(FILE_NAME, EXPECTED_BYTES)
+    file_path = DATA_FOLDER + FILE_NAME
     words = read_data(file_path)
     dictionary, _ = build_vocab(words, vocab_size)
     index_words = convert_words_to_index(words, dictionary)

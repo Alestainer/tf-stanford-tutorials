@@ -9,9 +9,9 @@ import gc
 
 # Constants
 FILE_PATH = './data/heart.txt'
-test_ratio = 0.1
+test_ratio = 0.2
 learning_rate = 0.01
-n_epochs = 40
+n_epochs = 15
 
 # Reading the data
 data = pd.read_csv(FILE_PATH, sep = "\s+")
@@ -66,6 +66,7 @@ optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate).minimize(loss)
 
 
 with tf.Session() as sess:
+	writer = tf.summary.FileWriter('./graphs', sess.graph)
 	start_time = time.time()
 	sess.run(tf.global_variables_initializer())
 	for i in range(n_epochs):
@@ -87,3 +88,4 @@ with tf.Session() as sess:
 
 	print ('Accuracy on the test set: ' + str(sum(acc) / len(y_test)))
 
+writer.close()

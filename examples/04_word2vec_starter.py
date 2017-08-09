@@ -23,7 +23,7 @@ EMBED_SIZE = 128 # dimension of the word embedding vectors
 SKIP_WINDOW = 1 # the context window
 NUM_SAMPLED = 64    # Number of negative examples to sample.
 LEARNING_RATE = 1.0
-NUM_TRAIN_STEPS = 20000
+NUM_TRAIN_STEPS = 60000
 SKIP_STEP = 2000 # how many steps to skip before reporting the loss
 
 def word2vec(batch_gen):
@@ -81,12 +81,12 @@ def word2vec(batch_gen):
     # Step 5: define optimizer
     
     # TO DO
-    optimizer = tf.GradientDescentOptimizer(LEARNING_RATE).minimize(loss)
+    optimizer = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(loss)
     
 
     with tf.Session() as sess:
         # TO DO: initialize variables
-        sess.run(tf.global_variable_initializer())
+        sess.run(tf.global_variables_initializer())
 
         total_loss = 0.0 # we use this to calculate the average loss in the last SKIP_STEP steps
         writer = tf.summary.FileWriter('./graphs/no_frills/', sess.graph)
